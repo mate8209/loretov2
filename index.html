@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loreto — Proyecto de Ordenamiento Territorial</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:wght@600;700&display=swap');
+:root{
+  --bg:#f5f2ec; --paper:#fffdf8; --ink:#161917; --ink2:#343a35; --muted:#6d706b;
+  --green:#24553a; --green2:#5d8f38; --soft:#edf4e8; --brown:#8a4d22; --blue:#2d6f88;
+  --line:#d4ccbf; --shadow:0 18px 48px rgba(29,36,28,.14);
+}
+*{box-sizing:border-box} html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111812;color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+.deck{height:100vh;width:100vw;display:flex;align-items:center;justify-content:center}
+.slide{display:none;position:relative;width:min(1280px,100vw);height:min(720px,100vh);background:var(--bg);padding:38px 58px 64px;overflow:hidden}
+.slide.active{display:block}
+.slide::after{content:"";position:absolute;left:58px;right:58px;bottom:42px;border-bottom:1px solid var(--line)}
+.tag{font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:16px;font-weight:800}
+h1,h2{font-family:"Source Serif 4",Georgia,serif;letter-spacing:-.035em;color:var(--ink);margin:0}
+h1{font-size:64px;line-height:1.02}
+h2{font-size:42px;line-height:1.05;margin-bottom:18px}
+h3{margin:0 0 7px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--green);font-weight:800}
+p,li{font-size:14px;line-height:1.48;color:var(--ink2);margin:0}
+ul{margin:0;padding-left:18px} li{margin-bottom:6px} strong{font-weight:800;color:var(--ink)}
+.small{font-size:11px;color:var(--muted)} .big{font-size:18px;line-height:1.42}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.split55{display:grid;grid-template-columns:55fr 45fr;gap:24px;height:calc(100% - 84px)}
+.split45{display:grid;grid-template-columns:45fr 55fr;gap:24px;height:calc(100% - 84px)}
+.stack{display:flex;flex-direction:column;gap:12px;min-height:0}
+.card{background:rgba(255,255,255,.80);border:1px solid var(--line);border-radius:10px;padding:14px 16px;box-shadow:0 8px 22px rgba(20,25,20,.04)}
+.card.green{border-left:5px solid var(--green);background:#fbfff8}
+.card.brown{border-left:5px solid var(--brown);background:#fff9ef}
+.card.blue{border-left:5px solid var(--blue);background:#f6fbfd}
+.callout{background:var(--green);border-radius:12px;padding:18px 22px;box-shadow:var(--shadow)}
+.callout p,.callout li{color:rgba(255,255,255,.95)} .callout strong{color:#fff}
+.media{position:relative;background:#e7e0d5;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:0;box-shadow:0 8px 28px rgba(30,36,28,.08)}
+.media img{display:block;width:100%;height:100%}
+.contain img{object-fit:contain}.cover img{object-fit:cover}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:26px 12px 9px;background:linear-gradient(transparent,rgba(0,0,0,.70));color:#fff;font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.source{position:absolute;left:58px;bottom:19px;color:var(--muted);font-size:10px}
+.doc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.doc img{width:100%;height:100%;object-fit:contain}
+.cover-slide{background:linear-gradient(135deg,#fffdf8 0%,#f3efe6 50%,#e2eddf 100%)}
+.cover-layout{height:100%;display:grid;grid-template-columns:58fr 42fr;gap:34px;align-items:center}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:30px;border-top:1px solid var(--line);padding-top:16px}
+.meta div{border-right:1px solid var(--line);padding-right:14px;margin-right:14px}.meta div:last-child{border-right:0}
+.meta small{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:800;margin-bottom:4px}
+.meta b{font-size:12px;line-height:1.25}
+.stat{background:#fff;border:1px solid var(--line);border-radius:10px;text-align:center;padding:14px 10px}
+.stat .n{display:block;font-family:"Source Serif 4";font-size:32px;line-height:1;color:var(--green);font-weight:800}
+.stat .l{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:800}
+.photoGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;height:100%}
+.objectives{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.obj{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px}.num{font-family:"Source Serif 4";font-size:34px;color:var(--green);font-weight:800;line-height:1}
+.foar{display:grid;grid-template-columns:1fr 1fr;gap:0;height:496px;border:1px solid var(--line);background:#fff}
+.foar .cell{padding:14px 16px;border:1px solid var(--line);overflow:hidden}.foar li{font-size:13px}.foar .cell:nth-child(1){background:#eff8ea}.foar .cell:nth-child(2){background:#f7fbf4}.foar .cell:nth-child(3){background:#fff8ef}.foar .cell:nth-child(4){background:#f1efea}
+.gantt{width:100%;border-collapse:collapse;font-size:12px;background:#fff}.gantt th{background:var(--green);color:#fff;font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:8px;border:1px solid rgba(255,255,255,.25)}.gantt td{border:1px solid var(--line);padding:8px}.gantt .etapa td{background:#e7f0e2;color:var(--green);font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}.bar{height:12px;background:var(--green);border-radius:3px}.bar.b{background:var(--brown)}.bar.c{background:var(--blue)}
+.controls{position:fixed;right:22px;bottom:14px;display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.93);border:1px solid #ddd;border-radius:999px;padding:7px 10px;box-shadow:0 8px 26px rgba(0,0,0,.22);z-index:30}.controls button{width:30px;height:30px;border:0;border-radius:50%;background:var(--green);color:#fff;font-size:20px;cursor:pointer}.controls span{min-width:50px;text-align:center;font-size:12px;font-weight:800}
+@media(max-width:900px){body{overflow:auto}.deck{display:block}.slide{width:100vw;height:auto;min-height:100vh;padding:28px 24px 60px;overflow:visible}.slide::after{left:24px;right:24px}.split55,.split45,.cover-layout,.grid2,.grid3,.grid4{grid-template-columns:1fr;height:auto}.photoGrid{height:auto}.media{min-height:250px}h1{font-size:42px}h2{font-size:32px}.controls{position:fixed}}
+@media print{body{overflow:visible;background:#fff}.deck{display:block}.slide{display:block!important;width:1280px;height:720px;break-after:page}.controls{display:none}}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<section class="slide cover-slide active">
+  <div class="cover-layout">
+    <div>
+      <div class="tag">Trabajo Final 2026 · Doctorado en Desarrollo Territorial · UNRC</div>
+      <h1>Loreto, territorio posible</h1>
+      <p class="big" style="margin-top:14px;max-width:720px;color:var(--muted)">Proyecto preliminar de ordenamiento territorial: planificación ambiental, gobernanza y desarrollo local en el eje del Comité Iberá.</p>
+      <div class="meta">
+        <div><small>Integrantes</small><b>Juan Pablo Ybarra<br>Sebastián Slobayen</b></div>
+        <div><small>Materia</small><b>Ordenamiento y<br>Planificación Territorial</b></div>
+        <div><small>Docente</small><b>Dra. Vanesa<br>Crissi Aloranti</b></div>
+        <div><small>Territorio</small><b>Loreto<br>Corrientes</b></div>
+      </div>
+    </div>
+    <div class="media cover" style="height:520px"><img src="img/caballo-canoa.jpg"><div class="cap">Iberá como marco territorial de Loreto</div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">01 · Alcance de la consigna</div>
+  <h2>Proyecto, no plan ejecutado</h2>
+  <div class="split45">
+    <div class="stack">
+      <div class="callout"><p><strong>Se diseña una hoja de ruta</strong> para iniciar un proceso futuro de ordenamiento territorial. No se ejecuta todavía el plan, ni los talleres, ni las entrevistas.</p></div>
+      <div class="card green"><h3>Producto</h3><p>Propuesta técnico-política presentable ante municipio, Comité Iberá, UNNE y actores locales.</p></div>
+      <div class="card"><h3>Criterio de defensa</h3><p>El trabajo demuestra capacidad de integrar problemas, actores, metodología, tiempos, recursos y factibilidad.</p></div>
+    </div>
+    <div class="doc"><img src="img/plan-gob-beneficios-locales.png"></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">02 · Introducción territorial</div>
+  <h2>Localización estratégica de Loreto</h2>
+  <div class="split45">
+    <div class="stack">
+      <div class="card green"><h3>Ubicación</h3><p><strong>Loreto</strong>, Departamento San Miguel, Corrientes. Localidad vinculada al sistema Iberá y al Portal San Antonio.</p></div>
+      <div class="card"><h3>Escala</h3><p>Pequeña escala urbana, identidad local fuerte, borde ambiental sensible y conexión con un circuito ecoturístico provincial.</p></div>
+      <div class="grid3">
+        <div class="stat"><span class="n">3.513</span><span class="l">habitantes</span></div>
+        <div class="stat"><span class="n">Iberá</span><span class="l">sistema regional</span></div>
+        <div class="stat"><span class="n">San Antonio</span><span class="l">portal asociado</span></div>
+      </div>
+    </div>
+    <div class="media contain"><img src="img/localizacion-ibera.png"><div class="cap">Localización / Gran Parque Iberá</div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">03 · Escala regional</div>
+  <h2>Gran Parque Iberá como marco territorial</h2>
+  <div class="split55">
+    <div class="doc"><img src="img/gran-parque-intro.png"></div>
+    <div class="stack">
+      <div class="card green"><h3>Dato estructurante</h3><p>El Gran Parque Iberá articula Parque Provincial, Parque Nacional y área de amortiguamiento, con portales y localidades vinculadas.</p></div>
+      <div class="card"><h3>Implicancia para Loreto</h3><p>El OT local debe dialogar con conservación, reintroducción de especies, accesibilidad, servicios, turismo y desarrollo comunitario.</p></div>
+      <div class="card brown"><h3>Punto fino</h3><p>Loreto se ordena como localidad de borde: casco urbano + humedales + portal turístico + gobernanza regional.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">04 · Base urbano-ambiental</div>
+  <h2>Uso del suelo y borde hídrico</h2>
+  <div class="split55">
+    <div class="media contain"><img src="img/uso-suelo-loreto.png"><div class="cap">Mapa de usos de suelo — Loreto</div></div>
+    <div class="stack">
+      <div class="card green"><h3>Lectura territorial</h3><p>El casco urbano aparece rodeado por superficies de agua, bajos y áreas ambientalmente sensibles. La mancha urbana concentra usos residenciales, mixtos, comerciales, espacios públicos y baldíos.</p></div>
+      <div class="card brown"><h3>Problema para el OT</h3><p>La relación entre ocupación urbana, infraestructura, drenaje y ambiente exige reglas claras antes de que los conflictos se consoliden.</p></div>
+      <div class="card blue"><h3>Uso en la presentación</h3><p>Este mapa permite mostrar que la propuesta no parte de una abstracción: hay una base espacial concreta para discutir zonificación, servicios y riesgos.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">05 · Problema territorial</div>
+  <h2>Necesidades, limitaciones y tensiones</h2>
+  <div class="grid4" style="margin-bottom:16px">
+    <div class="card brown"><h3>Servicios</h3><p>Agua, cloacas, residuos, drenajes y capacidad urbana frente a nuevas demandas.</p></div>
+    <div class="card brown"><h3>Ambiente</h3><p>Riesgos hídricos, borde lagunar, bajos, humedales y biodiversidad sensible.</p></div>
+    <div class="card brown"><h3>Turismo</h3><p>Flujo concentrado en el portal con bajo derrame hacia el casco urbano.</p></div>
+    <div class="card brown"><h3>Gobernanza</h3><p>Antecedentes valiosos con necesidad de integración territorial.</p></div>
+  </div>
+  <div class="media cover" style="height:355px"><img src="img/ibera-humedal-aereo.png"><div class="cap">El soporte natural condiciona infraestructura, asentamiento y actividades</div></div>
+</section>
+
+<section class="slide">
+  <div class="tag">06 · Potencialidades</div>
+  <h2>Producción de naturaleza y cultura local</h2>
+  <div class="split45">
+    <div class="stack">
+      <div class="card green"><h3>Visión Iberá</h3><p>El modelo combina conservación, restauración, reintroducción de especies, ecoturismo y revalorización cultural.</p></div>
+      <div class="card"><h3>Aplicación a Loreto</h3><p>Portal San Antonio, humedales, fauna emblemática, tradición jesuítico-guaraní, religiosidad popular, oficios y paisaje.</p></div>
+      <div class="card brown"><h3>Aporte doctoral</h3><p>Integrar riesgos hídricos, infraestructura urbana, patrimonio y desarrollo local en una agenda territorial común.</p></div>
+    </div>
+    <div class="photoGrid">
+      <div class="media cover"><img src="img/oso_hormiguero.jpg"><div class="cap">Oso hormiguero · fauna reintroducida</div></div>
+      <div class="media cover"><img src="img/ciervos.jpg"><div class="cap">Ciervos del Iberá</div></div>
+      <div class="media cover"><img src="img/loreto-iglesia.jpg"><div class="cap">Patrimonio religioso</div></div>
+      <div class="media cover"><img src="img/bajo_agua_ibera.jpg"><div class="cap">Ambiente acuático del Iberá</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">07 · Objetivos</div>
+  <h2>Objetivo general y específicos</h2>
+  <div class="callout"><p><strong>Objetivo general:</strong> diseñar un proyecto preliminar de ordenamiento territorial participativo para Loreto que articule conservación de humedales, organización urbano-servicial, gestión de riesgos y desarrollo local en el marco del sistema Iberá.</p></div>
+  <div class="objectives">
+    <div class="obj"><div class="num">1</div><h3>Caracterizar</h3><p>medio físico, población, actividades, asentamiento, relaciones, instituciones y marco legal.</p></div>
+    <div class="obj"><div class="num">2</div><h3>Identificar</h3><p>problemas, necesidades, potencialidades y limitaciones con base documental y participación local.</p></div>
+    <div class="obj"><div class="num">3</div><h3>Proponer</h3><p>metodología, Gantt, responsables, recursos, factibilidad y productos para iniciar el proceso real de OT.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">08 · Antecedentes conceptuales</div>
+  <h2>Competitividad, sostenibilidad y gobernanza</h2>
+  <div class="split55">
+    <div class="doc"><img src="img/plan-gob-ibera-mapa.png"></div>
+    <div class="stack">
+      <div class="card green"><h3>Territorio</h3><p>Conjunto de relaciones sociales, económicas, ambientales e institucionales sobre un soporte espacial.</p></div>
+      <div class="card green"><h3>Gobernanza</h3><p>Forma de gestión que articula Estado, sector privado, comunidad y conocimiento para decisiones colectivas.</p></div>
+      <div class="card brown"><h3>Clave para Loreto</h3><p>La competitividad territorial no depende sólo de tener recursos, sino de organizarlos con reglas, actores y capacidades.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">09 · Gobernanza territorial</div>
+  <h2>Comité Iberá como soporte institucional</h2>
+  <div class="split45">
+    <div class="stack">
+      <div class="card green"><h3>Modelo institucional</h3><p>El Comité Iberá representa una herramienta de gestión y gobernanza que articula actores, programas, obras y aprendizajes territoriales.</p></div>
+      <div class="card"><h3>Valor para el proyecto</h3><p>Loreto no depende sólo de la capacidad municipal: puede apoyarse en redes provinciales, universidad, prestadores, guardaparques, emprendedores y comunidad.</p></div>
+      <div class="card brown"><h3>Factibilidad</h3><p>La gobernanza reduce el riesgo de producir diagnósticos aislados y fortalece la posibilidad de pasar de saberes a haceres.</p></div>
+    </div>
+    <div class="doc"><img src="img/comite-indice.png"></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">10 · Sistema territorial</div>
+  <h2>Componentes a considerar en Loreto</h2>
+  <div class="grid3">
+    <div class="card green"><h3>Medio físico</h3><p>Humedales, lagunas, áreas inundables, biodiversidad y riesgos hídricos.</p></div>
+    <div class="card green"><h3>Población</h3><p>Escala local reducida, identidad loretana, capacidades sociales e institucionales.</p></div>
+    <div class="card green"><h3>Actividades</h3><p>Ganadería, empleo público, turismo de naturaleza, servicios y economía local.</p></div>
+    <div class="card"><h3>Asentamiento</h3><p>Casco urbano, periurbano, accesos, ruta, portal y espacios patrimoniales.</p></div>
+    <div class="card"><h3>Canales de relación</h3><p>Rutas, conectividad digital, vínculos con portales, San Miguel, Caá Catí y Corrientes.</p></div>
+    <div class="card"><h3>Instituciones y marco legal</h3><p>Municipio, Provincia, Comité Iberá, UNNE, Ley 25.675, normativa ambiental y urbana.</p></div>
+  </div>
+  <div class="card green" style="margin-top:18px"><h3>Lectura integrada</h3><p>El OT debe ordenar la relación entre soporte natural, forma de ocupación, actividades económicas, conectividad, institucionalidad y normativa.</p></div>
+</section>
+
+<section class="slide">
+  <div class="tag">11 · Metodología</div>
+  <h2>Enfoque bottom-up: técnicas e instrumentos</h2>
+  <div class="split55">
+    <div class="stack">
+      <div class="card green"><h3>Base documental</h3><p>Revisión de antecedentes, mapas, normativa, datos poblacionales, imágenes satelitales y documentos del Iberá.</p></div>
+      <div class="card green"><h3>Campo y actores</h3><p>Entrevistas semiestructuradas, observación directa, inventario territorial, mapeo de actores y cartografía social.</p></div>
+      <div class="card green"><h3>Talleres participativos</h3><p>Validación de problemas, vocaciones del territorio, matriz FOAR y priorización de acciones.</p></div>
+      <div class="card brown"><h3>Producto</h3><p>Hoja de ruta de OT: agenda de problemas, mapa de actores, cartera inicial de proyectos y condiciones de factibilidad.</p></div>
+    </div>
+    <div class="doc"><img src="img/gran-parque-mapa.png"></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">12 · Matriz FOAR</div>
+  <h2>Matriz FOAR aplicada</h2>
+  <div class="foar">
+    <div class="cell"><h3>Fortalezas</h3><ul><li>Identidad loretana y memoria jesuítico-guaraní.</li><li>Portal San Antonio y sistema Iberá.</li><li>Antecedentes técnicos y turísticos disponibles.</li><li>Fauna emblemática y producción de naturaleza.</li></ul></div>
+    <div class="cell"><h3>Oportunidades</h3><ul><li>Comité Iberá como plataforma de gobernanza.</li><li>Planificación e inversiones vinculadas al sistema Iberá.</li><li>Demanda por naturaleza, cultura y experiencias locales.</li><li>Soporte académico UNNE/UNRC.</li></ul></div>
+    <div class="cell"><h3>Aspiraciones</h3><ul><li>Loreto con agenda territorial común.</li><li>Servicios básicos alineados con desarrollo turístico.</li><li>Casco urbano integrado al portal.</li><li>Conservación con beneficios locales.</li></ul></div>
+    <div class="cell"><h3>Resultados esperados</h3><ul><li>Hoja de ruta validada.</li><li>Mapa de conflictos y prioridades.</li><li>Actores y responsabilidades identificadas.</li><li>Cartera inicial de acciones territoriales.</li></ul></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">13 · Cronograma y factibilidad</div>
+  <h2>Diagrama de Gantt — seis meses</h2>
+  <table class="gantt">
+    <thead><tr><th style="text-align:left;width:36%">Actividad</th><th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M5</th><th>M6</th><th>Responsable</th></tr></thead>
+    <tbody>
+      <tr class="etapa"><td colspan="8">Fase Hormiga — base técnica y diagnóstico</td></tr>
+      <tr><td>Revisión documental y cartográfica</td><td><div class="bar"></div></td><td><div class="bar"></div></td><td></td><td></td><td></td><td></td><td>Ambos</td></tr>
+      <tr><td>Diseño de instrumentos y fichas</td><td><div class="bar"></div></td><td></td><td></td><td></td><td></td><td></td><td>Juan Pablo</td></tr>
+      <tr><td>Inventario territorial y entrevistas</td><td></td><td><div class="bar"></div></td><td><div class="bar"></div></td><td></td><td></td><td></td><td>Ambos</td></tr>
+      <tr class="etapa"><td colspan="8">Fase Araña — articulación y propuesta</td></tr>
+      <tr><td>Mapeo de actores y talleres</td><td></td><td></td><td><div class="bar b"></div></td><td><div class="bar b"></div></td><td></td><td></td><td>Sebastián</td></tr>
+      <tr><td>Matriz FOAR y lineamientos</td><td></td><td></td><td></td><td><div class="bar b"></div></td><td><div class="bar b"></div></td><td></td><td>Ambos</td></tr>
+      <tr><td>Hoja de ruta, factibilidad y validación</td><td></td><td></td><td></td><td></td><td><div class="bar c"></div></td><td><div class="bar c"></div></td><td>Ambos + actores</td></tr>
+    </tbody>
+  </table>
+  <div class="grid3" style="margin-top:15px">
+    <div class="card green"><h3>Recursos</h3><p>Documentos, mapas, equipo académico, escala local manejable.</p></div>
+    <div class="card green"><h3>Concreción</h3><p><strong>100%</strong> para formular el proyecto preliminar.</p></div>
+    <div class="card brown"><h3>Condición</h3><p>La implementación futura depende de validación municipal y continuidad institucional.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="tag">14 · Cierre y bibliografía</div>
+  <h2>Territorio posible</h2>
+  <div class="split45">
+    <div class="stack">
+      <div class="callout"><p>Ordenar Loreto es construir una agenda situada para decidir en común cómo articular ambiente, comunidad, patrimonio, servicios y economía local.</p></div>
+      <div class="card green"><h3>Idea final</h3><p>El Comité Iberá aporta escala, redes y soporte institucional; el proyecto de OT debe traducir esa oportunidad regional en beneficios concretos para el casco urbano y la comunidad loretana.</p></div>
+      <div class="card brown"><h3>Fuentes</h3><p class="small">Bozzano; Gómez Orea; Massiris Cabeza; Crissi Aloranti; Trabajo Final 2026 — UNRC; Gran Parque Iberá; Comité Iberá 2015–2025; Planificación y gobernanza 2019–2029; Ley 25.675.</p></div>
+    </div>
+    <div class="media cover"><img src="img/ciervos.jpg"><div class="cap">Conservación + comunidad + desarrollo local</div></div>
+  </div>
+</section>
+
+
+
+</div>
+<nav class="controls"><button id="prev">‹</button><span id="counter"></span><button id="next">›</button></nav>
+<script>
+const slides=[...document.querySelectorAll('.slide')];let current=0;const counter=document.getElementById('counter');
+function show(i){slides[current].classList.remove('active');current=(i+slides.length)%slides.length;slides[current].classList.add('active');counter.textContent=(current+1)+' / '+slides.length}
+document.getElementById('next').onclick=()=>show(current+1);document.getElementById('prev').onclick=()=>show(current-1);
+document.addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key))show(current+1);if(['ArrowLeft','PageUp','Backspace'].includes(e.key))show(current-1)});
+let sx=null;document.addEventListener('touchstart',e=>sx=e.changedTouches[0].clientX);document.addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)show(current+(dx<0?1:-1));sx=null});show(0);
+</script>
+</body>
+</html>
